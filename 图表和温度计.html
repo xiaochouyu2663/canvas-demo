@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    
+  </style>
+</head>
+<body>
+    <canvas id="canvas1" style="border: 1px solid red;margin: 60px;" width="180" height="180"></canvas>
+
+    <canvas id="canvas2" style="border: 1px solid red;margin: 120px;" width="300" height="300"></canvas>
+
+    <canvas id="canvas3" style="border: 1px solid red;margin: 120px;" width="200" height="300"></canvas>
+    <script type="text/javascript">
+    var config = {
+      id:'canvas1',
+      radius : 85,
+      splitNumber: 5,
+      scaleNumber: 10,
+      max: 220,
+      min: 0,
+      pointerColor: '#FE4F4D',
+      startAngle: 153,
+      endAngle: 387,
+      currentValue: 44,
+      data: {
+        value: '187A',
+        label: '电压'
+      }
+    }
+    var config1 = {
+      id:'canvas2',
+      radius : 120,
+      splitNumber: 5,
+      scaleNumber: 10,
+      max: 330,
+      min: 0,
+      pointerColor: '#f9c01d',
+      startAngle: 153,
+      endAngle: 387,
+      currentValue: 360,
+      data: {
+        value: '220A',
+        label: '电流'
+      }
+    }
+    var  config2 = {
+      id:'canvas3',
+      currentValue: 24,
+      max: 30,
+      min: 0,
+      splitNumber: 5
+    }
+    DY(config)
+    DL(config1)
+    WD(config2)
+    function WD(obj){
+      var canvas = document.getElementById(obj.id)
+      canvas.onmouseover = function(e){
+        console.log(e);
+      }
+      var ctx = canvas.getContext('2d')
+      var width = canvas.width
+      var height = canvas.height
+      var xCenter = width/2
+      var yCenter = height/2
+
+      var currentValue = 0;
+      (function draw () {
+          currentValue+=obj.currentValue/50;
+          ctx.clearRect(0,0,width,height);
+
+          
+
+      //温度计灰色条
+      ctx.beginPath();
+      ctx.strokeStyle = '#dcdcdc'
+      ctx.moveTo(xCenter,40)
+      ctx.lineTo(xCenter,height-40)
+      ctx.lineWidth = height * 0.2
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      //温度计灰色弧度
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,height-40,height * 0.2 /2 + height* 0.04,0,2*Math.PI)
+      ctx.lineWidth = 0;
+      ctx.fillStyle ="#dcdcdc"
+      ctx.fill()
+
+      //温度计白色条
+      ctx.restore()
+      ctx.beginPath();
+      ctx.strokeStyle = '#fff'
+      ctx.moveTo(xCenter,40)
+      ctx.lineTo(xCenter,height - 40)
+      ctx.lineWidth = height * 0.2 /3
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      //温度计白色弧度
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,height - 40,height * 0.2 /2 / 2 + height* 0.03,0,2*Math.PI)
+      ctx.fillStyle ="#fff"
+      ctx.fill()
+
+      //温度计条
+      var grad=ctx.createLinearGradient(xCenter,40,xCenter,height - 40); //创建一个渐变色线性对象
+      grad.addColorStop(0,"#fe524b");                  //定义渐变色颜色
+      grad.addColorStop(0.3,"#f9c01d");
+      grad.addColorStop(1,"#5b79f1");
+      ctx.restore()
+      ctx.beginPath();
+      ctx.moveTo(xCenter,40)
+      ctx.lineTo(xCenter,height - 40)
+      ctx.lineWidth = height * 0.2 / 6
+      ctx.lineCap = 'butt'
+      ctx.strokeStyle = grad
+      ctx.stroke()
+
+
+      //温度弧度
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,height - 40, height * 0.2 / 8 + height* 0.02,0,2*Math.PI)
+      ctx.fillStyle ="#5b79f1"
+      ctx.fill()
+
+      //大刻度
+      for(var i=0;i<=obj.splitNumber;i++){
+           ctx.restore()
+          ctx.beginPath();
+          ctx.strokeStyle = '#fff'
+          ctx.moveTo(xCenter - height * 0.2 /2 ,height-40 - height * 0.2 /2 - (i) * (height - 80)  /(obj.splitNumber+1))
+          ctx.lineTo(xCenter - height * 0.2 /2 + 8,height - 40 - height * 0.2 /2 - (i) * (height - 80)  /(obj.splitNumber+1))
+          ctx.font="12px sans-serif";
+          ctx.fillStyle="#aaa"
+          ctx.textAlign='center';
+          ctx.fillText((obj.max - obj.min)/obj.splitNumber* i,xCenter - height * 0.2 /2 -30 ,height-40 - height * 0.2 /2 - (i) * (height - 80)  /(obj.splitNumber+1) + 5)
+          ctx.lineWidth = 1
+          ctx.stroke()
+
+      }
+
+      for(var j=0;j<=obj.splitNumber*5;j++){
+          ctx.restore()
+            ctx.beginPath();
+            ctx.strokeStyle = '#fff'
+            ctx.moveTo(xCenter - height * 0.2 /2 ,height-40 - height * 0.2 /2 - (j) * (height - 80)  /((obj.splitNumber+1)*5))
+            ctx.lineTo(xCenter - height * 0.2 /2 +3,height - 40 - height * 0.2 /2 - (j) * (height - 80)  /((obj.splitNumber+1)*5))
+            ctx.lineWidth = 1
+            ctx.stroke()
+      } 
+      
+      ctx.restore()
+      ctx.beginPath();
+      ctx.strokeStyle = '#fff'
+      ctx.font=height*0.07+"px sans-serif";
+      ctx.fillStyle="#aaa"
+      ctx.textAlign='center';
+      ctx.fillText('温度',xCenter + height * 0.2 /2 +50 ,height-40 - height * 0.12)
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath();
+      ctx.strokeStyle = '#fff'
+      ctx.font=height*0.1+"px sans-serif";
+      ctx.fillStyle="#000"
+      ctx.textAlign='center';
+      ctx.fillText(obj.currentValue+'℃',xCenter + height * 0.2 /2 +50 ,height-40)
+      ctx.lineWidth = 1
+      ctx.stroke()
+
+      //温度没到达的部分
+      ctx.restore()
+      ctx.beginPath();
+      ctx.moveTo(xCenter,40)
+      ctx.lineTo(xCenter, 45 + (obj.max - currentValue) / obj.max * (height - 80 + height * 0.2 / 8 - height * 0.2 /2 - height* 0.04) )
+      ctx.lineWidth = height * 0.2 / 4
+      ctx.lineCap = 'butt'
+      ctx.strokeStyle = '#fff'
+      ctx.stroke()
+      if(currentValue<obj.currentValue){
+            requestAnimationFrame(draw)
+          }
+      })()
+
+    }
+    function DY(obj){
+      var canvas = document.getElementById(obj.id)
+      var ctx = canvas.getContext('2d')
+      var width = canvas.width
+      var height = canvas.height
+      var xCenter = width/2
+      var yCenter = height/2
+      var currentValue = 0;
+      function draw () {
+        currentValue+=1;
+        ctx.clearRect(0,0,width,height);
+        drawDYBg(ctx,xCenter,yCenter,obj)
+        drawSplitLine(ctx,xCenter,yCenter,obj)
+        drawScal(ctx,xCenter,yCenter,obj)
+        drawLabel (ctx,xCenter,yCenter,obj)
+        drawZhen(ctx,xCenter,yCenter,obj,currentValue)
+        drawCarcle(ctx,xCenter,yCenter,obj)
+        if(currentValue<obj.currentValue){
+          requestAnimationFrame(draw)
+        }
+      }
+      draw ()
+    }
+    function DL(obj){
+      var canvas = document.getElementById(obj.id)
+      var ctx = canvas.getContext('2d')
+      var width = canvas.width
+      var height = canvas.height
+      var xCenter = width/2
+      var yCenter = height/2
+      var currentValue = 0
+      function draw () {
+          currentValue+=obj.currentValue/50;
+          ctx.clearRect(0,0,width,height);
+          drawBg(ctx,xCenter,yCenter,obj)
+          drawSplitLine(ctx,xCenter,yCenter,obj)
+          drawScal(ctx,xCenter,yCenter,obj)
+          drawLabel(ctx,xCenter,yCenter,obj)
+          drawZhen(ctx,xCenter,yCenter,obj,currentValue)
+          drawCarcle(ctx,xCenter,yCenter,obj)
+        if(currentValue<obj.currentValue&&currentValue<=obj.max){
+          requestAnimationFrame(draw)
+        }
+      }
+      draw()
+    }
+    function drawDYBg(ctx,xCenter,yCenter,obj){
+      ctx.beginPath();
+      ctx.arc(xCenter,yCenter,obj.radius,(obj.startAngle/180)*Math.PI,(obj.endAngle/180)*Math.PI)
+      ctx.strokeStyle = '#FE4F4D'
+      ctx.lineWidth = 8
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,obj.radius,1.11*Math.PI,1.89*Math.PI)
+      ctx.strokeStyle = '#FFC017'
+      ctx.lineWidth = 8
+      ctx.lineCap = 'butt'
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,obj.radius,1.37*Math.PI,1.63*Math.PI)
+      ctx.strokeStyle = '#19BE6B'
+      ctx.lineWidth = 8
+      ctx.stroke()
+     }
+    function drawBg(ctx,xCenter,yCenter,obj){
+      ctx.beginPath();
+      ctx.arc(xCenter,yCenter,obj.radius,(obj.startAngle/180)*Math.PI,(obj.endAngle/180)*Math.PI)
+      ctx.strokeStyle = '#e4e5ed'
+      ctx.lineWidth = 10
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,obj.radius,(obj.startAngle/180)*Math.PI,1.76*Math.PI)
+      ctx.strokeStyle = '#ffc017'
+      ctx.lineWidth = 10
+      ctx.lineCap = 'round'
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,obj.radius,(obj.startAngle/180)*Math.PI,1.1*Math.PI)
+      ctx.strokeStyle = '#5b79f1'
+      ctx.lineWidth = 10
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
+    //画分割线
+    function drawSplitLine(ctx,xCenter,yCenter,obj){
+      for(var i=0;i<=obj.splitNumber;i++){
+        ctx.restore()
+        ctx.beginPath()
+        
+        ctx.moveTo(xCenter+(Math.cos(((obj.startAngle+(obj.endAngle - obj.startAngle) / obj.splitNumber *i)/180)*Math.PI)*(obj.radius-20)),yCenter+(Math.sin(((obj.startAngle+(obj.endAngle - obj.startAngle) / obj.splitNumber *i)/180)*Math.PI)*(obj.radius-20)))
+        ctx.lineTo(xCenter+(Math.cos(((obj.startAngle+46.8*i)/180)*Math.PI)*(obj.radius-10)),yCenter+(Math.sin(((obj.startAngle+46.8*i)/180)*Math.PI)*(obj.radius-10)))
+
+        ctx.font="14px sans-serif";
+        ctx.fillStyle="#aaa"
+        ctx.textAlign='center';
+        ctx.fillText(((obj.max-obj.min)/obj.splitNumber)*i,xCenter+(Math.cos(((obj.startAngle+(obj.endAngle - obj.startAngle) / obj.splitNumber *i)/180)*Math.PI)*(obj.radius-36)),yCenter+(Math.sin(((obj.startAngle+(obj.endAngle - obj.startAngle) / obj.splitNumber *i)/180)*Math.PI)*(obj.radius-36)));
+        ctx.lineWidth = 1
+        ctx.strokeStyle = '#aaa'
+        ctx.stroke()
+      }
+    }
+    //画刻度
+    function drawScal(ctx,xCenter,yCenter,obj){
+      
+      for(var i=0;i<=obj.splitNumber* 10;i++){
+        ctx.restore()
+        ctx.beginPath()
+        
+        ctx.moveTo(xCenter+(Math.cos(((obj.startAngle+(obj.endAngle - obj.startAngle)/(obj.splitNumber * obj.scaleNumber)*i)/180)*Math.PI)*(obj.radius-15)),yCenter+(Math.sin(((obj.startAngle+(obj.endAngle - obj.startAngle)/(obj.splitNumber * obj.scaleNumber)*i)/180)*Math.PI)*(obj.radius-15)))
+        ctx.lineTo(xCenter+(Math.cos(((obj.startAngle+(obj.endAngle - obj.startAngle)/(obj.splitNumber * obj.scaleNumber)*i)/180)*Math.PI)*(obj.radius-10)),yCenter+(Math.sin(((obj.startAngle+(obj.endAngle - obj.startAngle)/(obj.splitNumber * obj.scaleNumber)*i)/180)*Math.PI)*(obj.radius-10)))
+
+        ctx.lineWidth = 1
+
+        ctx.strokeStyle = '#aaa'
+        ctx.stroke()
+      }
+    }
+    //画指针
+    function drawZhen(ctx,xCenter,yCenter,obj,currentValue){
+      //指针
+      ctx.restore()
+      ctx.beginPath();
+      ctx.fillStyle = obj.pointerColor
+      var Point = currentValue * (obj.endAngle-obj.startAngle) /(obj.max-obj.min)
+      ctx.lineTo(xCenter + 4* Math.cos((Point+60)/180*Math.PI), yCenter + 4* Math.sin((Point+60)/180*Math.PI))
+      ctx.lineTo(xCenter+Math.cos(((obj.startAngle+Point)/180)*Math.PI)*(obj.radius-25), yCenter+Math.sin(((obj.startAngle+Point)/180)*Math.PI)*(obj.radius-25))
+      ctx.lineTo(xCenter - 4* Math.cos((Point+60)/180*Math.PI), yCenter - 4* Math.sin((Point+60)/180*Math.PI))     
+      ctx.fill()
+      ctx.lineWidth = 3
+      ctx.lineCap = 'round'
+      ctx.strokeStyle = obj.pointerColor
+      ctx.stroke();
+    }
+    //画当前值
+    function drawLabel (ctx,xCenter,yCenter,obj){
+      ctx.restore()
+      ctx.beginPath()
+      ctx.font="24px sans-serif";
+      ctx.fillStyle="#000"
+      ctx.textAlign='center';
+      ctx.fillText(obj.currentValue+'A',xCenter,yCenter+(Math.sin(((obj.startAngle)/180)*Math.PI)*(obj.radius))+10)
+      ctx.stroke()
+
+      ctx.restore()
+      ctx.beginPath()
+      ctx.font="18px sans-serif";
+      ctx.fillStyle="#aaa"
+      ctx.textAlign='center';
+      ctx.fillText(obj.data.label,xCenter,yCenter+(Math.sin(((obj.startAngle)/180)*Math.PI)*(obj.radius))+35)
+      ctx.stroke()
+    }
+    //画圆点
+    function drawCarcle(ctx,xCenter,yCenter,obj){
+
+      var Point = obj.currentValue * (obj.endAngle-obj.startAngle) /(obj.max-obj.min)
+      //当前值的小白点
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter+Math.cos(((obj.startAngle+Point)/180)*Math.PI)*(obj.radius), xCenter+Math.sin(((obj.startAngle+Point)/180)*Math.PI)*(obj.radius),3,0,2*Math.PI)
+      ctx.fillStyle ="#fff"
+      ctx.fill()
+
+      //指针末端圆弧
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,5,0,2*Math.PI)
+      ctx.fillStyle = obj.pointerColor
+      ctx.fill()
+      
+      //指针上的小白点
+      ctx.restore()
+      ctx.beginPath()
+      ctx.arc(xCenter,yCenter,2,0,2*Math.PI)
+      ctx.fillStyle ="#fff"
+      ctx.fill()
+    }
+
+  </script>
+</body>
+</html>
